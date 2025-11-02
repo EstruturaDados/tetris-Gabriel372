@@ -1,56 +1,151 @@
 #include <stdio.h>
+#include <stdlib.h>
+#include <time.h>
 
-// Desafio Tetris Stack
-// Tema 3 - Integração de Fila e Pilha
-// Este código inicial serve como base para o desenvolvimento do sistema de controle de peças.
-// Use as instruções de cada nível para desenvolver o desafio.
+#define sizeList 5
+// Estrutura da peça
+typedef struct {
+    char type; 
+    int id;   
+} Piece;
+//vetor sobre a lista de peca
+typedef struct {
+    Piece list[sizeList];
+    int start;
+    int end;
+    int quantity;
+} ListOfPieces;
 
-int main() {
+ListOfPieces listofpeaces ;
+int OptionSelected;
 
-    // 🧩 Nível Novato: Fila de Peças Futuras
-    //
-    // - Crie uma struct Peca com os campos: tipo (char) e id (int).
-    // - Implemente uma fila circular com capacidade para 5 peças.
-    // - Crie funções como inicializarFila(), enqueue(), dequeue(), filaCheia(), filaVazia().
-    // - Cada peça deve ser gerada automaticamente com um tipo aleatório e id sequencial.
-    // - Exiba a fila após cada ação com uma função mostrarFila().
-    // - Use um menu com opções como:
-    //      1 - Jogar peça (remover da frente)
-    //      0 - Sair
-    // - A cada remoção, insira uma nova peça ao final da fila.
-
-
-
-    // 🧠 Nível Aventureiro: Adição da Pilha de Reserva
-    //
-    // - Implemente uma pilha linear com capacidade para 3 peças.
-    // - Crie funções como inicializarPilha(), push(), pop(), pilhaCheia(), pilhaVazia().
-    // - Permita enviar uma peça da fila para a pilha (reserva).
-    // - Crie um menu com opção:
-    //      2 - Enviar peça da fila para a reserva (pilha)
-    //      3 - Usar peça da reserva (remover do topo da pilha)
-    // - Exiba a pilha junto com a fila após cada ação com mostrarPilha().
-    // - Mantenha a fila sempre com 5 peças (repondo com gerarPeca()).
-
-
-    // 🔄 Nível Mestre: Integração Estratégica entre Fila e Pilha
-    //
-    // - Implemente interações avançadas entre as estruturas:
-    //      4 - Trocar a peça da frente da fila com o topo da pilha
-    //      5 - Trocar os 3 primeiros da fila com as 3 peças da pilha
-    // - Para a opção 4:
-    //      Verifique se a fila não está vazia e a pilha tem ao menos 1 peça.
-    //      Troque os elementos diretamente nos arrays.
-    // - Para a opção 5:
-    //      Verifique se a pilha tem exatamente 3 peças e a fila ao menos 3.
-    //      Use a lógica de índice circular para acessar os primeiros da fila.
-    // - Sempre valide as condições antes da troca e informe mensagens claras ao usuário.
-    // - Use funções auxiliares, se quiser, para modularizar a lógica de troca.
-    // - O menu deve ficar assim:
-    //      4 - Trocar peça da frente com topo da pilha
-    //      5 - Trocar 3 primeiros da fila com os 3 da pilha
-
-
-    return 0;
+int idGenerator() ;
+void startListOfPieces(ListOfPieces *listofpeaces) ;
+void  showListOfPieces(ListOfPieces *listofpeaces);
+void Options(int option);
+void showMenu();
+void playPeace(ListOfPieces *listofpeaces);
+void insertPeace(ListOfPieces *listofpeaces) ;
+Piece pieceGenerator();
+//gerador de id
+int idGenerator() {
+    int id = 00001 + rand() % 90000;
+    return id;
+}
+//exibe menu de opcoes
+void showMenu()
+{
+    printf("\n1 - Jogar uma peca \n");
+    printf("2 - Inserir uma nova peca \n");
+    printf("3 - Visualizar a Fila de pecas\n");
+    printf("0 - Sair \n");
+    printf("\nDigite o Numero da opcao desejada e aperte ENTER : ");
+    do
+    {
+        scanf("%d", &OptionSelected);
+        getchar();
+        if (OptionSelected < 0 || OptionSelected > 3)
+        {
+            printf("opcao incorreta! \n");
+            printf("Digite novamente: ");
+        }
+    } while (OptionSelected < 0 || OptionSelected > 3);
+    Options(OptionSelected);
+}
+//executa a opcao selecionada
+void Options(int option)
+{
+    switch (option)
+    {
+    case 1:
+    playPeace(&listofpeaces) ;
+        break;
+    case 2:
+    insertPeace(&listofpeaces);
+        break;
+    case 3:
+    showListOfPieces(&listofpeaces);
+        break;
+    case 0:
+    printf("Saindo .. \n");
+        exit(0);
+        break;
+    default:
+        printf("Opcao invalida !\n");
+        break;
+    }
+}
+//gerador de peca
+Piece pieceGenerator() {
+    char typesOfPieces[] = {'I', 'O', 'T', 'L'};
+    Piece newPiece;
+    newPiece.type = typesOfPieces[rand() % 4];
+    newPiece.id = idGenerator();
+    return newPiece;
+}
+//inicia a lista de peças
+void startListOfPieces(ListOfPieces *fp) {
+    fp->start = 0;
+    fp->end = 0;
+    fp->quantity = 0;
+    for (int i = 0; i < sizeList; i++) {
+        fp->list[fp->end] = pieceGenerator();
+        fp->end = (fp->end + 1) % sizeList;
+        fp->quantity++;
+    }
+}
+//exibe a lista de peças
+void showListOfPieces(ListOfPieces *listofpeaces) {
+    printf("= = = = = = = = = Fila de Pecas = = = = = = = = =\n");
+    int i = listofpeaces->start;
+if (listofpeaces->quantity == 0) 
+{
+   printf("Fila vazia no momento"); 
+}
+else{
+    for (int count = 0; count < listofpeaces->quantity; count++) {
+     printf("[ %c %d ] ", listofpeaces->list[i].type, listofpeaces->list[i].id);
+        i = (i + 1) % sizeList;
+    }
+    }
+printf("\n");
+    showMenu();
 }
 
+//jogar uma peça(remove a peça da frente)
+void playPeace(ListOfPieces *listofpeaces) {
+    if (listofpeaces->quantity == 0) {
+        printf("Fila vazia. Nenhuma peca para jogar.\n");
+        return;
+    }
+    printf("Peca jogada : [ %c %d ]\n\n", listofpeaces->list[listofpeaces->start].type, listofpeaces->list[listofpeaces->start].id);
+    listofpeaces->start = (listofpeaces->start + 1) % sizeList;
+    listofpeaces->quantity -- ;
+        showListOfPieces(listofpeaces);
+}
+//insere uma nova peça
+void insertPeace(ListOfPieces *listofpeaces) {
+    if (listofpeaces->quantity == sizeList) {
+        printf("Fila cheia. Nao e possivel inserir nova peca.\n");
+    }
+    else
+    {
+    listofpeaces->list[listofpeaces->end] = pieceGenerator();
+        printf("Peca inserida : [ %c %d ]\n\n",listofpeaces->list[listofpeaces->end].type,listofpeaces->list[listofpeaces->end].id); 
+    listofpeaces->end = (listofpeaces->end + 1) % sizeList;
+    listofpeaces->quantity++ ;
+}
+        showListOfPieces(listofpeaces);
+        showMenu();
+}
+
+int main(){
+// Inicializa o gerador de números aleatórios p/ fazer id
+srand(time(NULL));
+startListOfPieces(&listofpeaces);
+    printf("= = = = = = = = = = = = = = = = = = = = == = = =\n");
+    printf("                      Tetris                    \n");
+    printf("= = = = = = = = = = = = = = = = = = = = == = = =\n");
+showMenu();
+return 0;
+}
